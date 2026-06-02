@@ -1,0 +1,8 @@
+target/
+node_modules/
+.env
+*.wasm
+.stellar/
+dist/
+.DS_Store
+*.log

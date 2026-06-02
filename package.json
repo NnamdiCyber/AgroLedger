@@ -1,0 +1,30 @@
+{
+  "name": "agroledger-protocol",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "sdk",
+    "apps/ussd",
+    "apps/warehouse-portal",
+    "apps/buyer-portal",
+    "indexer"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "test:integration": "cd sdk && npm run test:integration",
+    "deploy:local": "node scripts/deploy/local.js",
+    "deploy:testnet": "node scripts/deploy/testnet.js",
+    "seed:local": "node scripts/seed/index.js --network local",
+    "lint": "eslint '**/*.ts' --ignore-path .eslintignore"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "eslint": "^8.57.0",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

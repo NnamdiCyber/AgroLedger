@@ -1,0 +1,31 @@
+[workspace]
+resolver = "2"
+members = [
+  "contracts/crop_token",
+  "contracts/collateral_vault",
+  "contracts/compliance_registry",
+  "contracts/cross_border_router",
+  "contracts/warehouse_oracle",
+  "contracts/harvest_vault",
+  "contracts/commodity_amm",
+  "contracts/forward_hedge",
+  "contracts/privacy_passport",
+  "oracle",
+]
+
+[workspace.dependencies]
+soroban-sdk = "21.0.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = false
+strip = "symbols"
+codegen-units = 1
+lto = true
+
+[profile.release-with-logs]
+inherits = "release"
+debug-assertions = true
