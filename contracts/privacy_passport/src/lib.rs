@@ -34,4 +34,80 @@ impl PrivacyPassport {
             .instance()
             .set(&DataKey::PassportCounter, &0u64);
     }
+
+    pub fn register(
+        env: Env,
+        nullifier_hash: BytesN<32>,
+        _credential_proof: BytesN<32>,
+        jurisdiction: Symbol,
+    ) -> u64 {
+        let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        admin.require_auth();
+
+        let mut counter: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::PassportCounter)
+            .unwrap();
+        counter += 1;
+
+        let passport = PassportState {
+            nullifier_hash: nullifier_hash.clone(),
+            jurisdiction: jurisdiction.clone(),
+            active: true,
+            registered_at: env.ledger().timestamp(),
+        };
+
+        env.storage()
+            .instance()
+            .set(&DataKey::Passport(counter), &passport);
+        env.storage()
+            .instance()
+            .set(&DataKey::PassportCounter, &counter);
+
+        env.events().publish(
+            (Symbol::new(&env, "PassportRegistered"), counter),
+            jurisdiction,
+        );
+
+        counter
+    }
+
+    pub fn verify(env: Env, passport_id: u64, required_jurisdiction: Symbol) -> bool {
+        let passport: PassportState = match env
+            .storage()
+            .instance()
+            .get(&DataKey::Passport(passport_id))
+        {
+            Some(p) => p,
+            None => return false,
+        };
+
+        if !passport.active {
+            return false;
+        }
+
+        passport.jurisdiction == required_jurisdiction
+    }
+
+    pub fn revoke(env: Env, passport_id: u64) {
+        let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        admin.require_auth();
+
+        let mut passport: PassportState = env
+            .storage()
+            .instance()
+            .get(&DataKey::Passport(passport_id))
+            .unwrap();
+        passport.active = false;
+
+        env.storage()
+            .instance()
+            .set(&DataKey::Passport(passport_id), &passport);
+
+        env.events().publish(
+            (Symbol::new(&env, "PassportRevoked"), passport_id),
+            (),
+        );
+    }
 }
