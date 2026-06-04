@@ -76,3 +76,96 @@ impl ComplianceRegistry {
         fatf::validate_travel_rule(amount)
     }
 }
+
+#[cfg(test)]
+mod test {
+    extern crate std;
+    use super::*;
+    use privacy_passport::{PrivacyPassport, PrivacyPassportClient};
+    use soroban_sdk::testutils::Address as _;
+    use soroban_sdk::{symbol_short, BytesN, Env};
+
+    fn setup_env() -> (
+        Env,
+        Address,
+        ComplianceRegistryClient<'static>,
+        PrivacyPassportClient<'static>,
+    ) {
+        let env = Env::default();
+        let admin = Address::generate(&env);
+        let passport_id = env.register_contract(None, PrivacyPassport);
+        let passport_client = PrivacyPassportClient::new(&env, &passport_id);
+        env.mock_all_auths();
+        passport_client.initialize(&admin);
+
+        let contract_id = env.register_contract(None, ComplianceRegistry);
+        let client = ComplianceRegistryClient::new(&env, &contract_id);
+        client.initialize(&admin, &passport_id);
+
+        (env, admin, client, passport_client)
+    }
+
+    fn register_passport(
+        env: &Env,
+        passport_client: &PrivacyPassportClient<'static>,
+        jurisdiction: &soroban_sdk::Symbol,
+    ) -> u64 {
+        passport_client.register(
+            &BytesN::from_array(env, &[1u8; 32]),
+            &BytesN::from_array(env, &[2u8; 32]),
+            jurisdiction,
+        )
+    }
+
+    #[test]
+    fn test_allowlist_add_remove() {
+        let (_env, _admin, client, _passport_client) = setup_env();
+
+        let ng = symbol_short!("NG");
+
+        assert!(!client.is_allowed(&ng));
+
+        client.add_jurisdiction(&ng);
+        assert!(client.is_allowed(&ng));
+
+        client.remove_jurisdiction(&ng);
+        assert!(!client.is_allowed(&ng));
+    }
+
+    #[test]
+    fn test_verify_passport_required() {
+        let (_env, _admin, client, passport_client) = setup_env();
+
+        let ng = symbol_short!("NG");
+        let us = symbol_short!("US");
+
+        client.add_jurisdiction(&ng);
+
+        let passport_id = register_passport(&_env, &passport_client, &ng);
+
+        assert!(client.verify(&passport_id, &ng));
+        assert!(!client.verify(&passport_id, &us));
+    }
+
+    #[test]
+    fn test_verify_blocked_jurisdiction() {
+        let (_env, _admin, client, passport_client) = setup_env();
+
+        let ng = symbol_short!("NG");
+
+        let passport_id = register_passport(&_env, &passport_client, &ng);
+
+        assert!(!client.verify(&passport_id, &ng));
+    }
+
+    #[test]
+    fn test_travel_rule_threshold() {
+        let (_env, _admin, client, _passport_client) = setup_env();
+
+        let ng = symbol_short!("NG");
+
+        assert!(client.validate_travel_rule(&5_000_000_000i128, &ng));
+        assert!(client.validate_travel_rule(&10_000_000_000i128, &ng));
+        assert!(!client.validate_travel_rule(&10_000_000_001i128, &ng));
+    }
+}
