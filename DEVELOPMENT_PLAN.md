@@ -51,7 +51,7 @@
 | Unit tests | `test_register`, `test_verify_valid`, `test_verify_revoked`, `test_verify_wrong_jurisdiction`, `test_revoke_unauthorized` |
 | Events | Emit `PassportRegistered`, `PassportRevoked` |
 
-### Day 3 — ComplianceRegistry Contract
+### Day 3 — ComplianceRegistry Contract ✅
 
 | Task | Detail |
 |------|--------|
