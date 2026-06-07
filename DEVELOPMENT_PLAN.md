@@ -1,3 +1,4 @@
+
 # AgroLedger — 16-Day Development Sprint to 50% Completion
 
 **Goal:** From zero source code to a deployable, tested foundation with core contracts, SDK, tooling, and contributor documentation. After this sprint, the protocol should be functional on Stellar testnet with meaningful test coverage and clear contribution paths.
