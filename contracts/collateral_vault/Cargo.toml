@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 soroban-sdk = { workspace = true }
@@ -13,6 +13,7 @@ soroban-sdk = { workspace = true }
 soroban-sdk = { workspace = true, features = ["testutils"] }
 compliance-registry = { path = "../compliance_registry", features = ["testutils"] }
 warehouse-oracle = { path = "../warehouse_oracle", features = ["testutils"] }
+privacy-passport = { path = "../privacy_passport", features = ["testutils"] }
 
 [features]
 testutils = ["soroban-sdk/testutils"]
