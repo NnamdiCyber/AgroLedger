@@ -222,6 +222,7 @@ name = "cross-border-router"
 version = "0.1.0"
 dependencies = [
  "compliance-registry",
+ "privacy-passport",
  "soroban-sdk",
 ]
 
