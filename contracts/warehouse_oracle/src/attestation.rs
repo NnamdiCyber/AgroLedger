@@ -41,6 +41,9 @@ pub fn execute_submit_lot(
     };
     env.storage().instance().set(&DataKey::Lot(counter), &lot);
     env.storage().instance().set(&DataKey::LotCounter, &counter);
+    env.storage()
+        .instance()
+        .set(&DataKey::LotLookup(warehouse_id.clone(), lot_id.clone()), &true);
 
     env.events().publish(
         (Symbol::new(&env, "LotSubmitted"), counter),

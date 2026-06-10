@@ -11,6 +11,7 @@ pub enum DataKey {
     InspectorSet,
     LotCounter,
     Lot(u64),
+    LotLookup(Symbol, Symbol),
     Price(Symbol),
 }
 
@@ -74,6 +75,13 @@ impl WarehouseOracle {
 
     pub fn get_price(env: Env, commodity: Symbol) -> PriceData {
         price_feed::execute_get_price(env, commodity)
+    }
+
+    pub fn verify_lot(env: Env, warehouse_id: Symbol, lot_id: Symbol) -> bool {
+        env.storage()
+            .instance()
+            .get(&DataKey::LotLookup(warehouse_id, lot_id))
+            .unwrap_or(false)
     }
 }
 
