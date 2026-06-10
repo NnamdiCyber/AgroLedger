@@ -1,0 +1,13 @@
+[package]
+name = "integration-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }
+privacy-passport = { path = "../privacy_passport", features = ["testutils"] }
+compliance-registry = { path = "../compliance_registry", features = ["testutils"] }
+warehouse-oracle = { path = "../warehouse_oracle", features = ["testutils"] }
+crop-token = { path = "../crop_token", features = ["testutils"] }
+collateral-vault = { path = "../collateral_vault", features = ["testutils"] }
+cross-border-router = { path = "../cross_border_router", features = ["testutils"] }
