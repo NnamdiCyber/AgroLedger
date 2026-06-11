@@ -164,6 +164,7 @@ dependencies = [
 name = "commodity-amm"
 version = "0.1.0"
 dependencies = [
+ "crop-token",
  "soroban-sdk",
 ]
 
