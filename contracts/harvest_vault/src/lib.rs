@@ -2,6 +2,7 @@
 use soroban_sdk::{contract, contractimpl, contracttype, Address, Env};
 
 mod vault;
+mod yield_;
 
 #[contracttype]
 pub enum DataKey {
@@ -58,6 +59,18 @@ impl HarvestVault {
 
     pub fn withdraw(env: Env, user: Address, hct_amount: i128) -> (i128, i128) {
         vault::execute_withdraw(env, user, hct_amount)
+    }
+
+    pub fn accrue_yield(env: Env, admin: Address) -> i128 {
+        yield_::execute_accrue_yield(env, admin)
+    }
+
+    pub fn get_apy(env: Env) -> u32 {
+        yield_::execute_get_apy(&env)
+    }
+
+    pub fn rebalance(env: Env, admin: Address) {
+        yield_::execute_rebalance(env, admin)
     }
 
     pub fn get_hct_balance(env: Env, user: Address) -> i128 {
@@ -218,6 +231,32 @@ mod test {
     }
 
     #[test]
+    fn test_yield_accrual() {
+        let (env, admin, vault, _vault_addr, crop, _usdc) = setup_env();
+        let crop_client = MockTokenClient::new(&env, &crop);
+
+        crop_client.mint(&admin, &100_000i128);
+        vault.deposit(&admin, &100_000i128);
+
+        assert_eq!(vault.get_total_yield(), 0);
+
+        // Advance time by ~180 days (half year)
+        env.ledger().set_timestamp(1_000_000 + 15_552_000);
+
+        let yield_amount = vault.accrue_yield(&admin);
+        // 100_000 * 800 * 15552000 / (31536000 * 10000) = ~3945
+        assert!(yield_amount > 0, "Yield should have accrued");
+        assert_eq!(vault.get_total_yield(), yield_amount);
+
+        // Withdraw with yield
+        let (crop_out, yield_out) = vault.withdraw(&admin, &100_000i128);
+        assert_eq!(crop_out, 100_000);
+        assert_eq!(yield_out, yield_amount);
+        assert_eq!(vault.get_total_yield(), 0);
+        assert_eq!(crop_client.balance(&admin), 100_000);
+    }
+
+    #[test]
     fn test_multiple_depositors() {
         let (env, admin, vault, _vault_id, crop, _usdc) = setup_env();
         let crop_client = MockTokenClient::new(&env, &crop);
@@ -256,6 +295,32 @@ mod test {
     }
 
     #[test]
+    fn test_rebalance() {
+        let (env, admin, vault, _vault_id, crop, _usdc) = setup_env();
+        let crop_client = MockTokenClient::new(&env, &crop);
+
+        crop_client.mint(&admin, &100_000i128);
+        vault.deposit(&admin, &100_000i128);
+
+        // Advance time
+        env.ledger().set_timestamp(1_000_000 + 86_400);
+
+        vault.rebalance(&admin);
+
+        // Yield should have been accrued and timestamp updated
+        let total_yield = vault.get_total_yield();
+        assert!(total_yield > 0);
+    }
+
+    #[test]
+    fn test_get_apy() {
+        let (_env, _admin, vault, _vault_id, _crop, _usdc) = setup_env();
+
+        let apy = vault.get_apy();
+        assert_eq!(apy, 800);
+    }
+
+    #[test]
     fn test_deposit_zero_fails() {
         let (env, admin, vault, _vault_id, crop, _usdc) = setup_env();
         let crop_client = MockTokenClient::new(&env, &crop);
@@ -280,5 +345,28 @@ mod test {
             vault.withdraw(&admin, &100_000i128);
         }));
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_deposit_with_yield_accrual() {
+        let (env, admin, vault, _vault_id, crop, _usdc) = setup_env();
+        let crop_client = MockTokenClient::new(&env, &crop);
+
+        crop_client.mint(&admin, &100_000i128);
+
+        vault.deposit(&admin, &100_000i128);
+
+        // Advance time and accrue yield
+        env.ledger().set_timestamp(1_000_000 + 15_552_000);
+        let yield_amount = vault.accrue_yield(&admin);
+        assert!(yield_amount > 0);
+
+        // Yield is in USDC, not CropTokens, so total yield should increase
+        assert_eq!(vault.get_total_yield(), yield_amount);
+
+        // Withdraw and verify both crop and yield returned
+        let (crop_out, yield_out) = vault.withdraw(&admin, &100_000i128);
+        assert_eq!(crop_out, 100_000);
+        assert_eq!(yield_out, yield_amount);
     }
 }
