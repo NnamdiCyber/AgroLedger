@@ -11,3 +11,6 @@ warehouse-oracle = { path = "../warehouse_oracle", features = ["testutils"] }
 crop-token = { path = "../crop_token", features = ["testutils"] }
 collateral-vault = { path = "../collateral_vault", features = ["testutils"] }
 cross-border-router = { path = "../cross_border_router", features = ["testutils"] }
+commodity-amm = { path = "../commodity_amm", features = ["testutils"] }
+harvest-vault = { path = "../harvest_vault", features = ["testutils"] }
+forward-hedge = { path = "../forward_hedge", features = ["testutils"] }
