@@ -7,3 +7,4 @@ dist/
 .DS_Store
 *.log
 test_snapshots/
+DEVELOPMENT_PLAN.md

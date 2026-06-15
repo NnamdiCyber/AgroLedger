@@ -699,9 +699,12 @@ name = "integration-tests"
 version = "0.1.0"
 dependencies = [
  "collateral-vault",
+ "commodity-amm",
  "compliance-registry",
  "crop-token",
  "cross-border-router",
+ "forward-hedge",
+ "harvest-vault",
  "privacy-passport",
  "soroban-sdk",
  "warehouse-oracle",
