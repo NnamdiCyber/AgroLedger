@@ -1,0 +1,29 @@
+[stellar]
+rpc_url = "http://localhost:8000/soroban/rpc"
+network_passphrase = "Standalone Network ; June 2018"
+horizon_url = "http://localhost:8000"
+
+[signing]
+secret_key = "S..."
+multisig_threshold = 3
+
+[price_feeds]
+interval_seconds = 300
+
+[price_feeds.afex]
+enabled = false
+api_key = ""
+api_url = "https://api.afexnigeria.com/v1"
+
+[price_feeds.gcx]
+enabled = false
+api_key = ""
+api_url = "https://api.gcx.com/v1"
+
+[price_feeds.cme]
+enabled = false
+api_key = ""
+api_url = "https://api.cmegroup.com/v1"
+
+[attestation]
+max_lot_weight_kg = 1000000
