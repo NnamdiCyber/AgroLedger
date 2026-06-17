@@ -18,7 +18,7 @@ pub fn compute_ltv(env: &Env, crop_token_amount: i128, commodity: &Symbol, debt_
         .storage()
         .instance()
         .get(&DataKey::WarehouseOracle)
-        .unwrap();
+        .expect("WarehouseOracle not set");
 
     let args: Vec<Val> = (commodity.clone(),).into_val(env);
     let price_data: PriceData =

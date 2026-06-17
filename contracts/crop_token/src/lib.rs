@@ -48,10 +48,10 @@ impl CropToken {
         quantity_kg: u64,
         oracle_sig: Bytes,
     ) -> Address {
-        let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        let admin: Address = env.storage().instance().get(&DataKey::Admin).expect("Admin not set");
         admin.require_auth();
 
-        let oracle: Address = env.storage().instance().get(&DataKey::WarehouseOracle).unwrap();
+        let oracle: Address = env.storage().instance().get(&DataKey::WarehouseOracle).expect("WarehouseOracle not set");
 
         let args: Vec<Val> = (warehouse_id.clone(), lot_id.clone()).into_val(&env);
         let lot_valid: bool = env.invoke_contract(
@@ -91,7 +91,7 @@ impl CropToken {
     }
 
     pub fn burn(env: Env, lot_id: Symbol) {
-        let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        let admin: Address = env.storage().instance().get(&DataKey::Admin).expect("Admin not set");
         admin.require_auth();
 
         let lot_meta = metadata::get_lot_metadata(&env, &lot_id);
@@ -118,7 +118,7 @@ impl CropToken {
     }
 
     pub fn link_passport(env: Env, address: Address, passport_id: u64, jurisdiction: Symbol) {
-        let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        let admin: Address = env.storage().instance().get(&DataKey::Admin).expect("Admin not set");
         admin.require_auth();
 
         env.storage()

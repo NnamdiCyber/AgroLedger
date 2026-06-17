@@ -78,7 +78,7 @@ impl ForwardHedge {
         env.storage()
             .instance()
             .get(&DataKey::Hedge(hedge_id))
-            .unwrap()
+            .expect("Hedge not found")
     }
 
     pub fn get_revealed_price(env: Env, hedge_id: u64) -> i128 {

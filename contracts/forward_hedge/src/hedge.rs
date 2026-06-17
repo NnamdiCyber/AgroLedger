@@ -54,7 +54,7 @@ pub fn execute_accept_hedge(env: Env, hedge_id: u64, farmer: Address) {
         .storage()
         .instance()
         .get(&DataKey::Hedge(hedge_id))
-        .unwrap();
+        .expect("Hedge not found");
 
     assert_eq!(
         hedge.status,
@@ -84,7 +84,7 @@ pub fn execute_reveal(env: Env, hedge_id: u64, price: i128, salt: i128) {
         .storage()
         .instance()
         .get(&DataKey::Hedge(hedge_id))
-        .unwrap();
+        .expect("Hedge not found");
 
     assert_eq!(
         hedge.status,

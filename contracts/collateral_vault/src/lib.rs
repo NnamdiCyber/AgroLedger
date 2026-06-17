@@ -85,7 +85,7 @@ impl CollateralVault {
         env.storage()
             .instance()
             .get(&DataKey::Vault(vault_id))
-            .unwrap()
+            .expect("Vault not found")
     }
 }
 

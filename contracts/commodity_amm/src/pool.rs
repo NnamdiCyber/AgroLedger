@@ -38,10 +38,10 @@ pub fn execute_swap(
         .expect("Pool does not exist");
 
     let (token_in, reserve_in, reserve_out) = if sell_crop {
-        let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).unwrap();
+        let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).expect("CropToken not set");
         (crop_token, pool.reserve_crop, pool.reserve_usdc)
     } else {
-        let usdc_token: Address = env.storage().instance().get(&DataKey::UsdcToken).unwrap();
+        let usdc_token: Address = env.storage().instance().get(&DataKey::UsdcToken).expect("USDC token not set");
         (usdc_token, pool.reserve_usdc, pool.reserve_crop)
     };
 
@@ -56,10 +56,10 @@ pub fn execute_swap(
     assert!(amount_out >= min_amount_out, "Slippage: amount_out below min");
 
     let token_out = if sell_crop {
-        let usdc_token: Address = env.storage().instance().get(&DataKey::UsdcToken).unwrap();
+        let usdc_token: Address = env.storage().instance().get(&DataKey::UsdcToken).expect("USDC token not set");
         usdc_token
     } else {
-        let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).unwrap();
+        let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).expect("CropToken not set");
         crop_token
     };
 
@@ -106,8 +106,8 @@ pub fn execute_add_liquidity(
         .get(&DataKey::PoolInfo(commodity.clone()))
         .expect("Pool does not exist");
 
-    let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).unwrap();
-    let usdc_token: Address = env.storage().instance().get(&DataKey::UsdcToken).unwrap();
+    let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).expect("CropToken not set");
+    let usdc_token: Address = env.storage().instance().get(&DataKey::UsdcToken).expect("USDC token not set");
 
     let (actual_crop, actual_usdc) = if pool.total_lp_supply > 0 {
         let ideal_usdc = amount_crop * pool.reserve_usdc / pool.reserve_crop;
@@ -205,8 +205,8 @@ pub fn execute_remove_liquidity(
     assert!(crop_out >= min_crop, "Crop output below minimum");
     assert!(usdc_out >= min_usdc, "USDC output below minimum");
 
-    let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).unwrap();
-    let usdc_token: Address = env.storage().instance().get(&DataKey::UsdcToken).unwrap();
+    let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).expect("CropToken not set");
+    let usdc_token: Address = env.storage().instance().get(&DataKey::UsdcToken).expect("USDC token not set");
 
     let transfer_crop_args: Vec<Val> =
         (env.current_contract_address(), user.clone(), crop_out).into_val(env);

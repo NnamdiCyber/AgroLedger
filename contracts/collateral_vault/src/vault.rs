@@ -22,7 +22,7 @@ pub fn execute_open(
         .storage()
         .instance()
         .get(&DataKey::ComplianceRegistry)
-        .unwrap();
+        .expect("ComplianceRegistry not set");
     let args: Vec<Val> = (passport_id, jurisdiction).into_val(&env);
     let compliant: bool = env.invoke_contract(
         &compliance_registry,
@@ -45,7 +45,7 @@ pub fn execute_open(
         .storage()
         .instance()
         .get(&DataKey::UsdcToken)
-        .unwrap();
+        .expect("USDC token not set");
     let args: Vec<Val> = (
         env.current_contract_address(),
         user.clone(),
@@ -59,7 +59,7 @@ pub fn execute_open(
         .storage()
         .instance()
         .get(&DataKey::VaultCounter)
-        .unwrap();
+        .expect("VaultCounter not initialized");
     let vault_id = counter + 1;
     let vault = VaultState {
         owner: user,
@@ -93,7 +93,7 @@ pub fn execute_repay(env: Env, user: Address, vault_id: u64, amount: i128) {
         .storage()
         .instance()
         .get(&DataKey::Vault(vault_id))
-        .unwrap();
+        .expect("Vault not found");
     assert!(vault.owner == user, "Not vault owner");
     assert!(
         amount <= vault.debt_amount,
@@ -105,7 +105,7 @@ pub fn execute_repay(env: Env, user: Address, vault_id: u64, amount: i128) {
         .storage()
         .instance()
         .get(&DataKey::UsdcToken)
-        .unwrap();
+        .expect("USDC token not set");
     let args: Vec<Val> = (user.clone(), env.current_contract_address(), amount).into_val(&env);
     let _: () = env.invoke_contract(&usdc, &Symbol::new(&env, "transfer"), args);
 
@@ -144,7 +144,7 @@ pub fn execute_liquidate(env: Env, liquidator: Address, vault_id: u64) {
         .storage()
         .instance()
         .get(&DataKey::Vault(vault_id))
-        .unwrap();
+        .expect("Vault not found");
 
     // Check LTV > 85% using oracle price
     let ltv =
@@ -156,7 +156,7 @@ pub fn execute_liquidate(env: Env, liquidator: Address, vault_id: u64) {
         .storage()
         .instance()
         .get(&DataKey::UsdcToken)
-        .unwrap();
+        .expect("USDC token not set");
     let args: Vec<Val> = (
         liquidator.clone(),
         env.current_contract_address(),

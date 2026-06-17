@@ -41,7 +41,7 @@ impl CommodityAmm {
 
     pub fn create_pool(env: Env, admin: Address, commodity: Symbol) {
         admin.require_auth();
-        let stored_admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        let stored_admin: Address = env.storage().instance().get(&DataKey::Admin).expect("Admin not set");
         assert_eq!(admin, stored_admin, "Only admin can create pools");
         pool::execute_create_pool(&env, commodity);
     }
@@ -82,7 +82,7 @@ impl CommodityAmm {
         env.storage()
             .instance()
             .get(&DataKey::PoolInfo(commodity))
-            .unwrap()
+            .expect("Pool does not exist")
     }
 
     pub fn get_lp_balance(env: Env, user: Address, commodity: Symbol) -> i128 {

@@ -28,7 +28,7 @@ pub fn execute_route(
         .storage()
         .instance()
         .get(&DataKey::ComplianceRegistry)
-        .unwrap();
+        .expect("ComplianceRegistry not set");
 
     let args: Vec<Val> = (
         travel_rule_data.passport_id,

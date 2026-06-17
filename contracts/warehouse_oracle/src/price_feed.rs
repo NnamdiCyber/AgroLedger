@@ -2,7 +2,7 @@ use soroban_sdk::{Address, Env, Symbol};
 use crate::{DataKey, PriceData};
 
 pub fn execute_push_price(env: Env, commodity: Symbol, price_usdc: u64, timestamp: u64) {
-    let oracle: Address = env.storage().instance().get(&DataKey::OraclePubkey).unwrap();
+    let oracle: Address = env.storage().instance().get(&DataKey::OraclePubkey).expect("OraclePubkey not set");
     oracle.require_auth();
 
     let price_data = PriceData {

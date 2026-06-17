@@ -6,7 +6,7 @@ pub fn execute_deposit(env: Env, user: Address, amount: i128) -> i128 {
     user.require_auth();
     assert!(amount > 0, "Deposit amount must be positive");
 
-    let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).unwrap();
+    let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).expect("CropToken not set");
 
     let args: Vec<Val> = (user.clone(), env.current_contract_address(), amount).into_val(&env);
     let _: () = env.invoke_contract(&crop_token, &Symbol::new(&env, "transfer"), args);
@@ -61,12 +61,12 @@ pub fn execute_withdraw(env: Env, user: Address, hct_amount: i128) -> (i128, i12
         .storage()
         .instance()
         .get(&DataKey::TotalHctSupply)
-        .unwrap();
+        .expect("TotalHctSupply not set");
     let total_crop: i128 = env
         .storage()
         .instance()
         .get(&DataKey::TotalCropDeposited)
-        .unwrap();
+        .expect("TotalCropDeposited not set");
     let total_yield: i128 = env
         .storage()
         .instance()
@@ -89,13 +89,13 @@ pub fn execute_withdraw(env: Env, user: Address, hct_amount: i128) -> (i128, i12
         .instance()
         .set(&DataKey::TotalYieldUsdc, &(total_yield - yield_out));
 
-    let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).unwrap();
+    let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).expect("CropToken not set");
     let crop_args: Vec<Val> =
         (env.current_contract_address(), user.clone(), crop_out).into_val(&env);
     let _: () = env.invoke_contract(&crop_token, &Symbol::new(&env, "transfer"), crop_args);
 
     if yield_out > 0 {
-        let usdc_token: Address = env.storage().instance().get(&DataKey::UsdcToken).unwrap();
+        let usdc_token: Address = env.storage().instance().get(&DataKey::UsdcToken).expect("USDC token not set");
         let usdc_args: Vec<Val> =
             (env.current_contract_address(), user.clone(), yield_out).into_val(&env);
         let _: () = env.invoke_contract(&usdc_token, &Symbol::new(&env, "transfer"), usdc_args);

@@ -27,13 +27,13 @@ impl ComplianceRegistry {
     }
 
     pub fn add_jurisdiction(env: Env, code: Symbol) {
-        let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        let admin: Address = env.storage().instance().get(&DataKey::Admin).expect("Admin not set");
         admin.require_auth();
         allowlist::add_jurisdiction(&env, &code);
     }
 
     pub fn remove_jurisdiction(env: Env, code: Symbol) {
-        let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        let admin: Address = env.storage().instance().get(&DataKey::Admin).expect("Admin not set");
         admin.require_auth();
         allowlist::remove_jurisdiction(&env, &code);
     }
@@ -55,7 +55,7 @@ impl ComplianceRegistry {
             .storage()
             .instance()
             .get(&DataKey::PrivacyPassport)
-            .unwrap();
+            .expect("PrivacyPassport address not set");
 
         let args: Vec<Val> = (passport_id, jurisdiction.clone()).into_val(&env);
         let valid: bool = env.invoke_contract(

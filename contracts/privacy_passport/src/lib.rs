@@ -41,14 +41,14 @@ impl PrivacyPassport {
         _credential_proof: BytesN<32>,
         jurisdiction: Symbol,
     ) -> u64 {
-        let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        let admin: Address = env.storage().instance().get(&DataKey::Admin).expect("Admin not set");
         admin.require_auth();
 
         let mut counter: u64 = env
             .storage()
             .instance()
             .get(&DataKey::PassportCounter)
-            .unwrap();
+            .expect("Passport counter not initialized");
         counter += 1;
 
         let passport = PassportState {
@@ -91,14 +91,14 @@ impl PrivacyPassport {
     }
 
     pub fn revoke(env: Env, passport_id: u64) {
-        let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        let admin: Address = env.storage().instance().get(&DataKey::Admin).expect("Admin not set");
         admin.require_auth();
 
         let mut passport: PassportState = env
             .storage()
             .instance()
             .get(&DataKey::Passport(passport_id))
-            .unwrap();
+            .expect("Passport not found");
         passport.active = false;
 
         env.storage()

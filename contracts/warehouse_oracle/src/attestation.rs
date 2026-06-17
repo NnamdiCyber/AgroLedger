@@ -9,7 +9,7 @@ pub fn execute_submit_lot(
     quantity_kg: u64,
     inspector_sigs: Vec<Address>,
 ) -> u64 {
-    let inspectors: InspectorSet = env.storage().instance().get(&DataKey::InspectorSet).unwrap();
+    let inspectors: InspectorSet = env.storage().instance().get(&DataKey::InspectorSet).expect("InspectorSet not initialized");
 
     let required = if quantity_kg > 50_000 {
         if inspectors.threshold >= 3 {
@@ -27,7 +27,7 @@ pub fn execute_submit_lot(
     }
 
     for i in 0..count {
-        inspector_sigs.get(i).unwrap().require_auth();
+        inspector_sigs.get(i).expect("Invalid inspector sig index").require_auth();
     }
 
     let counter = env.storage().instance().get(&DataKey::LotCounter).unwrap_or(0) + 1;

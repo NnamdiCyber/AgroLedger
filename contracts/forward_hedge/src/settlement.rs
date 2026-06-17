@@ -14,7 +14,7 @@ pub fn execute_settle(
         .storage()
         .instance()
         .get(&DataKey::Hedge(hedge_id))
-        .unwrap();
+        .expect("Hedge not found");
 
     assert_eq!(
         hedge.status,
@@ -32,7 +32,7 @@ pub fn execute_settle(
         .get(&DataKey::RevealedPrice(hedge_id))
         .expect("Price must be revealed before settlement");
 
-    let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).unwrap();
+    let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).expect("CropToken not set");
 
     if settlement_type == Symbol::new(&env, "Physical") {
         let args: Vec<Val> = (
@@ -77,7 +77,7 @@ pub fn execute_cancel(env: Env, hedge_id: u64, caller: Address) {
         .storage()
         .instance()
         .get(&DataKey::Hedge(hedge_id))
-        .unwrap();
+        .expect("Hedge not found");
 
     assert!(
         hedge.status == Symbol::new(&env, "Placed")
@@ -93,7 +93,7 @@ pub fn execute_cancel(env: Env, hedge_id: u64, caller: Address) {
     let penalty_amount = hedge.quantity * penalty_bps / 10000;
 
     if hedge.status == Symbol::new(&env, "Accepted") && penalty_amount > 0 {
-        let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).unwrap();
+        let crop_token: Address = env.storage().instance().get(&DataKey::CropToken).expect("CropToken not set");
         let args: Vec<Val> = (
             hedge.farmer.clone(),
             hedge.buyer.clone(),

@@ -22,5 +22,5 @@ pub fn get_asset(env: &Env, symbol: &Symbol) -> Address {
     env.storage()
         .instance()
         .get(&DataKey::Asset(symbol.clone()))
-        .unwrap()
+        .expect("Asset not registered")
 }

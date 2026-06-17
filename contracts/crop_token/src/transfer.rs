@@ -9,11 +9,11 @@ pub fn execute_transfer(env: Env, from: Address, to: Address, amount: i128) {
     // Compliance check: only if sender has a linked passport (user-initiated transfers)
     // Contract-to-contract transfers (e.g. vault liquidation) skip compliance
     if env.storage().instance().has(&super::DataKey::AddressPassport(from.clone())) {
-        let compliance_registry: Address = env.storage().instance().get(&super::DataKey::ComplianceRegistry).unwrap();
+        let compliance_registry: Address = env.storage().instance().get(&super::DataKey::ComplianceRegistry).expect("ComplianceRegistry not set");
         let passport_data: (u64, Symbol) = env.storage()
             .instance()
             .get(&super::DataKey::AddressPassport(from.clone()))
-            .unwrap();
+            .expect("Passport not linked to address");
 
         let args: Vec<Val> = (passport_data.0, passport_data.1.clone()).into_val(&env);
         let compliant: bool = env.invoke_contract(
